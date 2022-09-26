@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<libvirt/libvirt.h>
+#include<libvirt/virterror.h>
 #include<math.h>
 #include<string.h>
 #include<unistd.h>
@@ -91,6 +92,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 {
 	virDomainPtr * activeDomains = NULL;
 	int numDomains = virConnectListAllDomains(conn, &activeDomains, VIR_CONNECT_LIST_DOMAINS_ACTIVE | VIR_CONNECT_LIST_DOMAINS_RUNNING);
+	printf("num of domains %d",numDomains);
 	if(numDomains==-1){
 		printf("unable to get list of domains");
 		return -1;
@@ -98,15 +100,16 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 
 	memStatsPtr memDomains = malloc(sizeof(memStats)*numDomains);	
 	for(int i=0; i<numDomains; i++){
-		virDomainSetMemoryStatsPeriod(activeDomains[i], 1, VIR_DOMAIN_AFFECT_CURRENT);			
+		virDomainSetMemoryStatsPeriod(activeDomains[i], interval, VIR_DOMAIN_AFFECT_CURRENT);			
 	}
 
-	int LOADED_THRESHOLD = 150 * 1024;
-	int FREE_THRESHOLD = 200 * 1024;
+	int LOADED_THRESHOLD = 1024;
+	int FREE_THRESHOLD = 1024;
 
 	for(int i=0; i<numDomains; i++){
 			memDomains[i].domain = activeDomains[i];
 			int nr_stats = VIR_DOMAIN_MEMORY_STAT_NR;
+			printf("num of stats %d",nr_stats);
 			virDomainMemoryStatPtr stats = malloc(sizeof(virDomainMemoryStatStruct)*nr_stats);
 			virDomainMemoryStats(activeDomains[i], stats, nr_stats, 0);
 			for(int i=0; i<nr_stats; i++){
@@ -159,9 +162,14 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 			}
 		}
 
+	//sleep(interval);
+
 	for(int i=0; i<numDomains; i++){
 		virDomainFree(activeDomains[i]);
 	}
 	free(activeDomains);
-	virConnectClose(conn);
 }
+
+
+
+
