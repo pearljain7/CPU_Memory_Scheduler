@@ -105,16 +105,16 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	int FREE_THRESHOLD = 200 * 1024;
 
 	for(int i=0; i<numDomains; i++){
-			memDomains[i]->domain = activeDomains[i];
+			memDomains[i].domain = activeDomains[i];
 			int nr_stats = VIR_DOMAIN_MEMORY_STAT_NR;
 			virDomainMemoryStatPtr stats = malloc(sizeof(virDomainMemoryStatStruct)*nr_stats);
 			virDomainMemoryStats(activeDomains[i], stats, nr_stats, 0);
 			for(int i=0; i<nr_stats; i++){
 				if(stats[i].tag==VIR_DOMAIN_MEMORY_STAT_UNUSED){
-					memDomains[i]->unused = stats[i].val;
+					memDomains[i].unused = stats[i].val;
 				}
 				if(stats[i].tag == VIR_DOMAIN_MEMORY_STAT_AVAILABLE){
-					memDomains[i]->available = stats[i].val;
+					memDomains[i].available = stats[i].val;
 				}
 
 			}
