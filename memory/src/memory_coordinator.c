@@ -27,15 +27,36 @@ static unsigned long getFreeMemInHost(virConnectPtr conn){
 	virNodeMemoryStatsPtr params = malloc(sizeof(virNodeMemoryStats) * nparams);
 	memset(params, 0, sizeof(virNodeMemoryStats) * nparams);
 	virNodeGetMemoryStats(conn,VIR_NODE_MEMORY_STATS_ALL_CELLS, params, &nparams, 0);
+	//printf("free memory %d",VIR_NODE_MEMORY_STATS_ALL_CELLS);
 		
 	for(int i=0; i < nparams; i++){
 		 if(strcmp(params[i].field, VIR_NODE_MEMORY_STATS_FREE)==0){
-			freeMem = params[i].value;break;
+			freeMem = params[i].value;
+			break;
 		}
 	}
 	free(params);
 	return freeMem;
 }
+
+static void updateMemStats(virDomainPtr domain, memStatsPtr memStat){
+	memStat->domain = domain;
+	
+	int nr_stats = VIR_DOMAIN_MEMORY_STAT_NR;
+	virDomainMemoryStatPtr stats = malloc(sizeof(virDomainMemoryStatStruct)*nr_stats);
+	virDomainMemoryStats(domain, stats, nr_stats, 0);
+	for(int i=0; i<nr_stats; i++){
+		if(stats[i].tag==VIR_DOMAIN_MEMORY_STAT_UNUSED && stats[i].val<947*1024){
+			memStat->unused = stats[i].val;
+		}
+		if(stats[i].tag == VIR_DOMAIN_MEMORY_STAT_AVAILABLE  && stats[i].val<947*1024){
+			memStat->available = stats[i].val;
+		}
+
+	}
+
+}
+
 
 void MemoryScheduler(virConnectPtr conn,int interval);
 
@@ -91,38 +112,34 @@ COMPLETE THE IMPLEMENTATION
 void MemoryScheduler(virConnectPtr conn, int interval)
 {
 	virDomainPtr * activeDomains = NULL;
+	int mems=0;
 	int numDomains = virConnectListAllDomains(conn, &activeDomains, VIR_CONNECT_LIST_DOMAINS_ACTIVE | VIR_CONNECT_LIST_DOMAINS_RUNNING);
-	printf("num of domains %d",numDomains);
+	//printf("\nnum of domains %d",numDomains);
 	if(numDomains==-1){
-		printf("unable to get list of domains");
+		printf("\nunable to get list of domains");
 		return -1;
 	}
-
+	
 	memStatsPtr memDomains = malloc(sizeof(memStats)*numDomains);	
 	for(int i=0; i<numDomains; i++){
-		virDomainSetMemoryStatsPeriod(activeDomains[i], interval, VIR_DOMAIN_AFFECT_CURRENT);			
+		int mems = virDomainSetMemoryStatsPeriod(activeDomains[i], 1, VIR_DOMAIN_AFFECT_CURRENT);	
 	}
 
-	int LOADED_THRESHOLD = 1024;
-	int FREE_THRESHOLD = 1024;
+	unsigned long memFreeInHost = getFreeMemInHost(conn);
 
-	for(int i=0; i<numDomains; i++){
-			memDomains[i].domain = activeDomains[i];
-			int nr_stats = VIR_DOMAIN_MEMORY_STAT_NR;
-			printf("num of stats %d",nr_stats);
-			virDomainMemoryStatPtr stats = malloc(sizeof(virDomainMemoryStatStruct)*nr_stats);
-			virDomainMemoryStats(activeDomains[i], stats, nr_stats, 0);
-			for(int i=0; i<nr_stats; i++){
-				if(stats[i].tag==VIR_DOMAIN_MEMORY_STAT_UNUSED){
-					memDomains[i].unused = stats[i].val;
-				}
-				if(stats[i].tag == VIR_DOMAIN_MEMORY_STAT_AVAILABLE){
-					memDomains[i].available = stats[i].val;
-				}
+	int LOADED_THRESHOLD = memFreeInHost;
+	int FREE_THRESHOLD = (memFreeInHost)+50;
 
-			}
-	}
+	
+		for(int i=0; i<numDomains; i++){
+			updateMemStats(activeDomains[i], &memDomains[i]);			
+		}
 
+	// for(int i=0; i<numDomains; i++){
+	// 	unsigned long maxMem = virDomainGetMaxMemory(memDomains[i].domain);
+	// 	printf("\nmax mem %ld",maxMem*1024);		
+	// }
+	
 	//most and least used memory
 	int most=0, least=0;
 		unsigned long mostMem =memDomains[0].unused, leastMem=memDomains[0].unused;
@@ -136,6 +153,8 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 				least = i;
 			}
 		}
+		//printf("\nleast %ld",memDomains[least].unused);
+		//printf("\nmost %ld",memDomains[most].available);
 
 	//	if unused memory
 	if(memDomains[least].unused <= LOADED_THRESHOLD){
@@ -151,7 +170,8 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 			virDomainSetMemory(memDomains[most].domain, memDomains[most].available-LOADED_THRESHOLD);
 		}
 
-	unsigned long memFreeInHost = getFreeMemInHost(conn);
+	memFreeInHost = getFreeMemInHost(conn);
+	printf("free memory %ld",memFreeInHost);
 	
 	if(memFreeInHost <=LOADED_THRESHOLD){
 			//go through all domains and take away memory wherever possible
@@ -169,7 +189,3 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	}
 	free(activeDomains);
 }
-
-
-
-

@@ -35,7 +35,6 @@ SCRIPT
 
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/ubuntu-20.04"
-  config.disksize.size = '50GB'
 
   config.vm.provider "virtualbox" do |vb|
     vb.gui = true
