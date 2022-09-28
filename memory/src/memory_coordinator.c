@@ -12,11 +12,11 @@
 
 int is_exit = 0; // DO NOT MODIFY THE VARIABLE
 
-static const int STARVATION_THRESHOLD = 150 * 1024;
+static const int STARVATION_THRESHOLD = 100 * 1024;
 
 // Define an available memory threshold above which a domain can be
 // considered to be wasting memory (in MB)
-static const int WASTE_THRESHOLD = 300 * 1024;
+static const int WASTE_THRESHOLD = 512 * 1024;
 
 struct DomainsList domains_list(virConnectPtr conn);
 struct DomainsList active_domains(virConnectPtr conn);
@@ -88,7 +88,24 @@ char *tagToMeaning(int tag)
 	return meaning;
 }
 
-
+static unsigned long getFreeMemInHost(virConnectPtr conn){
+	int nparams=4;
+	unsigned long freeMem;
+	
+	virNodeMemoryStatsPtr params = malloc(sizeof(virNodeMemoryStats) * nparams);
+	memset(params, 0, sizeof(virNodeMemoryStats) * nparams);
+	virNodeGetMemoryStats(conn,VIR_NODE_MEMORY_STATS_ALL_CELLS, params, &nparams, 0);
+	//printf("free memory %d",VIR_NODE_MEMORY_STATS_ALL_CELLS);
+		
+	for(int i=0; i < nparams; i++){
+		 if(strcmp(params[i].field, VIR_NODE_MEMORY_STATS_FREE)==0){
+			freeMem = params[i].value;
+			break;
+		}
+	}
+	free(params);
+	return freeMem;
+}
 
 void printDomainStats(struct DomainsList list)
 {
@@ -258,9 +275,9 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 		starved = relevantDomains[1];
 		free(relevantDomains);
 
-		if (starved.memory <= STARVATION_THRESHOLD) {
+		if (starved.memory <= STARVATION_THRESHOLD) { //- domain 100
 		// At this point, we must assign more memory to the domain
-			if (wasteful.memory >= WASTE_THRESHOLD) {
+			if (wasteful.memory >= WASTE_THRESHOLD) { //2048
 				// The most wasteful domain will get less memory, precisely
 				// 'waste/2', and the most starved domain will get
 				// removed the same quantity.
@@ -272,7 +289,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 						   starved.memory + wasteful.memory/2);
 			} else {
 				// There is not any waste (< WASTE_THRESHOLD) and a domain is
-				// critical (< STARVATION_THRESHOLD).
+				// critical (< STARVATION_THRESHOLD). //200 - host 
 				// Assign memory from the hypervisor until the starved host
 				// has STARVATION_THRESHOLD available.
 				//
@@ -294,6 +311,9 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 					   wasteful.memory - WASTE_THRESHOLD);
 			printf("DONE\n");
 		}
+
+		unsigned long memFreeInHost = getFreeMemInHost(conn);
+		printf("\nfree memory %ld",memFreeInHost);
 	}
 
 }

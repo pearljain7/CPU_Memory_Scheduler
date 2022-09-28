@@ -36,7 +36,7 @@ For each test, you will need to follow the procedure outlined below:
 2. Start all of the VMs using the *~/project1/startallvm.py* script
 3. Copy the test binaries into each VM by running the *~/project1/memory/test/assignall.sh* script
 4. Open a new terminal (e.g., a separate terminal window or a tmux/screen session) and use the *script* command to capture terminal output by running command *script memory_coordinator1.log*
-5. In the same terminal, start the provided monitoring tool by running the command *~/project1/memory/test/mscript memory_coordinator1.log*. The *script* command from Step 3 will capture the monitoring tool output to *memory_coordinator1.log* so that you can submit it with your assignment.
+5. In the same terminal, start the provided monitoring tool by running the command *~/project1/memory/test/monitor.py -t runtest1.py*. The *script* command from Step 3 will capture the monitoring tool output to *memory_coordinator1.log* so that you can submit it with your assignment.
 6. In a new terminal, start your Memory Coordinator by running the *memory_coordinator* binary
 7. Use the output from the monitoring tool to determine if your Memory Coordinator is producing the correct behavior as described under *~/project1/memory/test/README.md*
 8. After your test has completed, type "exit" on the command line to stop *script* from logging the console output. A record of your monitoring will be in the file *memory_coordinator1.log*, which you will submit with your assignment deliverables.
