@@ -7,6 +7,7 @@
 #include<unistd.h>
 #include<limits.h>
 #include<signal.h>
+#include<stdbool.h>
 #define MIN(a,b) ((a)<(b)?a:b)
 #define MAX(a,b) ((a)>(b)?a:b)
 
@@ -20,7 +21,13 @@ typedef struct memStats{
 
 typedef struct memStats * memStatsPtr;
 
-bool isFirst = true;
+bool isFirst=true;
+int numDomains=0;
+virDomainPtr * activeDomains = NULL;
+memStatsPtr memDomains;
+unsigned long memFreeInHost;
+int LOADED_THRESHOLD = 100*1024;
+int FREE_THRESHOLD = 150*1024;
 
 static unsigned long getFreeMemInHost(virConnectPtr conn){
 	int nparams=4;
@@ -115,24 +122,19 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 {
 
 	if(isFirst){
-		virDomainPtr * activeDomains = NULL;
-		int mems=0;
-		int numDomains = virConnectListAllDomains(conn, &activeDomains, VIR_CONNECT_LIST_DOMAINS_ACTIVE | VIR_CONNECT_LIST_DOMAINS_RUNNING);
+		numDomains = virConnectListAllDomains(conn, &activeDomains, VIR_CONNECT_LIST_DOMAINS_ACTIVE | VIR_CONNECT_LIST_DOMAINS_RUNNING);
 		//printf("\nnum of domains %d",numDomains);
 		if(numDomains==-1){
 			printf("\nunable to get list of domains");
 			return -1;
 		}
 		
-		memStatsPtr memDomains = malloc(sizeof(memStats)*numDomains);	
+		memDomains = malloc(sizeof(memStats)*numDomains);	
 		for(int i=0; i<numDomains; i++){
 			int mems = virDomainSetMemoryStatsPeriod(activeDomains[i], 1, VIR_DOMAIN_AFFECT_CURRENT);	
 		}
 
-		unsigned long memFreeInHost = getFreeMemInHost(conn);
-
-		int LOADED_THRESHOLD = 100*1024;
-		int FREE_THRESHOLD = 150*1024;
+		memFreeInHost = getFreeMemInHost(conn);
 		isFirst = false;
 	}
 	else{
