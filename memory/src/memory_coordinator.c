@@ -27,7 +27,7 @@ virDomainPtr * activeDomains = NULL;
 memStatsPtr memDomains;
 unsigned long memFreeInHost;
 int LOADED_THRESHOLD = 100*1024;
-int FREE_THRESHOLD = 150*1024;
+int FREE_THRESHOLD = 100*1024;
 
 static unsigned long getFreeMemInHost(virConnectPtr conn){
 	int nparams=4;
@@ -147,7 +147,9 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 		// 	unsigned long maxMem = virDomainGetMaxMemory(memDomains[i].domain);
 		// 	printf("\nmax mem %ld",maxMem*1024);		
 		// }
-		
+		memFreeInHost = getFreeMemInHost(conn);
+		printf("free memory %ld",memFreeInHost);
+
 		//most and least used memory
 		int most=0, least=0;
 			unsigned long mostMem =memDomains[0].unused, leastMem=memDomains[0].unused;
@@ -161,25 +163,22 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 					least = i;
 				}
 			}
-			//printf("\nleast %ld",memDomains[least].unused);
-			//printf("\nmost %ld",memDomains[most].available);
+			printf("\nleast unused%ld",memDomains[least].unused);
+			printf("\nmost unused %ld",memDomains[most].unused);
 
 		//	if unused memory
 		if(memDomains[least].unused <= LOADED_THRESHOLD){
 				//if the domain with most free memory can afford to give memory, take memory away
-				if(memDomains[most].unused >= FREE_THRESHOLD){
+				if(memDomains[most].unused >= FREE_THRESHOLD){ //memory>100,
 					//balloon can be inflated 
 					virDomainSetMemory(memDomains[most].domain, memDomains[most].available-LOADED_THRESHOLD);
 					virDomainSetMemory(memDomains[least].domain, memDomains[least].available+LOADED_THRESHOLD);
-				} else { //give the memory from host
+				} else if(memFreeInHost>200*1024){ //give the memory from host
 					virDomainSetMemory(memDomains[least].domain, memDomains[least].available+FREE_THRESHOLD);
 				}
 			} else if(memDomains[most].unused >= FREE_THRESHOLD){ //there is a domain which is using unnecessary memory
 				virDomainSetMemory(memDomains[most].domain, memDomains[most].available-LOADED_THRESHOLD);
 			}
-
-		memFreeInHost = getFreeMemInHost(conn);
-		printf("free memory %ld",memFreeInHost);
 		
 		if(memFreeInHost <=LOADED_THRESHOLD){
 				//go through all domains and take away memory wherever possible
