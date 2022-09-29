@@ -1,0 +1,97 @@
+Script started on 2022-09-29 03:10:08+00:00 [TERM="xterm-256color" TTY="/dev/pts/11" COLUMNS="112" LINES="24"]
+]0;azureuser@pr1-vm: ~/CPU_Memory_Scheduler/cpu/test[01;32mazureuser@pr1-vm[00m:[01;34m~/CPU_Memory_Scheduler/cpu/test[00m$ exitpython3 monitor.py -t runtest1.py[C[1P1.py21.py[1P1.pyt1.py[C[1P.py2.py
+
+--------------------------------------------------
+Iteration number :  1
+0 - usage: 0.0 | mapping []
+1 - usage: 0.0 | mapping []
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  2
+0 - usage: 0.0 | mapping []
+1 - usage: 0.0 | mapping ['aos_vm5', 'aos_vm7', 'aos_vm6']
+2 - usage: 0.0 | mapping ['aos_vm3', 'aos_vm1', 'aos_vm8']
+3 - usage: 0.0 | mapping ['aos_vm2', 'aos_vm4']
+
+--------------------------------------------------
+Iteration number :  3
+0 - usage: 0.0 | mapping []
+1 - usage: 1.0 | mapping ['aos_vm5', 'aos_vm7', 'aos_vm6']
+2 - usage: 0.0 | mapping ['aos_vm3', 'aos_vm1', 'aos_vm8']
+3 - usage: 0.0 | mapping ['aos_vm2', 'aos_vm4']
+
+--------------------------------------------------
+Iteration number :  4
+0 - usage: 0.0 | mapping []
+1 - usage: 1.0 | mapping ['aos_vm5', 'aos_vm7', 'aos_vm6']
+2 - usage: 0.0 | mapping ['aos_vm3', 'aos_vm1', 'aos_vm8']
+3 - usage: 0.0 | mapping ['aos_vm2', 'aos_vm4']
+
+--------------------------------------------------
+Iteration number :  5
+0 - usage: 0.0 | mapping []
+1 - usage: 0.0 | mapping ['aos_vm5', 'aos_vm7', 'aos_vm6']
+2 - usage: 0.0 | mapping ['aos_vm3', 'aos_vm1', 'aos_vm8']
+3 - usage: 0.0 | mapping ['aos_vm2', 'aos_vm4']
+
+--------------------------------------------------
+Iteration number :  6
+0 - usage: 7.000000000000001 | mapping ['aos_vm5', 'aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 0.0 | mapping []
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  7
+0 - usage: 97.0 | mapping ['aos_vm5', 'aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 0.0 | mapping []
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  8
+0 - usage: 89.0 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 23.0 | mapping ['aos_vm5']
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  9
+0 - usage: 102.0 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 77.0 | mapping ['aos_vm5']
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  10
+0 - usage: 100.0 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 44.0 | mapping ['aos_vm5']
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  11
+0 - usage: 100.0 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 42.0 | mapping ['aos_vm5']
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  12
+0 - usage: 102.0 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 42.0 | mapping ['aos_vm5']
+2 - usage: 0.0 | mapping []
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  13
+0 - usage: 100.0 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_vm4']
+1 - usage: 0.0 | mapping []
+2 - usage: 43.0 | mapping ['aos_vm5']
+3 - usage: 0.0 | mapping []
+
+--------------------------------------------------
+Iteration number :  14
+0 - usage: 101.00000000000003 | mapping ['aos_vm7', 'aos_vm3', 'aos_vm2', 'aos_vm1', 'aos_vm6', 'aos_vm8', 'aos_
