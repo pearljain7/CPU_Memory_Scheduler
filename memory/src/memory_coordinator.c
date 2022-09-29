@@ -166,7 +166,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 			printf("\nLeast unused for vm%d: %ld",least,memDomains[least].unused);
 			printf("\nMost unused for vm%d: %ld",most,memDomains[most].unused);
 			printf("\nLeast available for vm%d: %ld",least,memDomains[least].available);
-			printf("\nMost available for vm%d: %ld",most,memDomains[most].available;
+			printf("\nMost available for vm%d: %ld",most,memDomains[most].available);
 
 
 		//	if unused memory 

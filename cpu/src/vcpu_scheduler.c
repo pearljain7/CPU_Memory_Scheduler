@@ -11,7 +11,7 @@
 #define MAX(a,b) ((a)>(b)?a:b)
 
 int is_exit = 0; // DO NOT MODIFY THIS VARIABLE
-
+bool isFirst=true;
 typedef struct getDomainStats {
 	virDomainPtr domain;
 	long time;
@@ -80,14 +80,16 @@ int main(int argc, char *argv[])
 /* COMPLETE THE IMPLEMENTATION */
 void CPUScheduler(virConnectPtr conn, int interval)
 {
-
+	if(isFirst){
 	printf("\nRunning code");
 	pcpuPtr pcpuStats = NULL;
 	int prevNumDomains; 
 	virDomainPtr * activeDomains = NULL;
 	
 	int numDom =  virConnectListAllDomains(conn, &activeDomains, VIR_CONNECT_LIST_DOMAINS_ACTIVE | VIR_CONNECT_LIST_DOMAINS_RUNNING);
-
+	isFirst = false;
+	}
+	else{
 	domainPtr currDomainStats = malloc(numDom*sizeof(getDomainStats));
 	memset(currDomainStats,0,numDom*sizeof(getDomainStats));
 
@@ -197,7 +199,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
 				
 		memcpy(prevDomainStats, currDomainStats,numDom * sizeof(getDomainStats));
 		free(currDomainStats);
-	
+	}
 
 	free(pcpuStats);
 	free(prevDomainStats);
