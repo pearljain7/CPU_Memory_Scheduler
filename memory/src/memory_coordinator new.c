@@ -16,7 +16,7 @@ static const int STARVATION_THRESHOLD = 100 * 1024;
 
 // Define an available memory threshold above which a domain can be
 // considered to be wasting memory (in MB)
-static const int WASTE_THRESHOLD = 512 * 1024;
+static const int WASTE_THRESHOLD = 150 * 1024;
 
 struct DomainsList domains_list(virConnectPtr conn);
 struct DomainsList active_domains(virConnectPtr conn);
