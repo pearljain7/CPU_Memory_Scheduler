@@ -148,7 +148,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 		// 	printf("\nmax mem %ld",maxMem*1024);		
 		// }
 		memFreeInHost = getFreeMemInHost(conn);
-		printf("free memory %ld",memFreeInHost);
+		printf("\nfree memory %ld",memFreeInHost);
 
 		//most and least used memory
 		int most=0, least=0;
@@ -173,22 +173,20 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 		if(memDomains[least].unused <= LOADED_THRESHOLD){ //least mem domain has memory less than 100
 				//if the domain with most free memory can afford to give memory, take memory away
 				if(memDomains[most].unused >= FREE_THRESHOLD){ //memory>150,
-					//balloon can be inflated 
-					while(memDomains[most].unused>100){
-					virDomainSetMemory(memDomains[most].domain, memDomains[most].available-LOADED_THRESHOLD);
-					virDomainSetMemory(memDomains[least].domain, memDomains[least].available+LOADED_THRESHOLD);
-					}
+					//balloon can be inflated
+					virDomainSetMemory(memDomains[most].domain, memDomains[most].available-50*1024);
+					virDomainSetMemory(memDomains[least].domain, memDomains[least].available+50*1024);
 				} else if(memFreeInHost>200*1024){ //give the memory from host
-					virDomainSetMemory(memDomains[least].domain, memDomains[least].available+FREE_THRESHOLD);
+					virDomainSetMemory(memDomains[least].domain, memDomains[least].available+100*1024);
 				}
 			} else if(memDomains[most].unused >= FREE_THRESHOLD){ //there is a domain which is using unnecessary memory to the host
-				virDomainSetMemory(memDomains[most].domain, memDomains[most].available-LOADED_THRESHOLD);
+				virDomainSetMemory(memDomains[most].domain, memDomains[most].available-50*1024);
 			}
 		if(memFreeInHost <=LOADED_THRESHOLD){
 				//go through all domains and take away memory wherever possible
 				for(int i=0; i< numDomains; i++){
 					if(memDomains[i].unused >= FREE_THRESHOLD){
-						virDomainSetMemory(memDomains[i].domain, memDomains[i].available-LOADED_THRESHOLD);
+						virDomainSetMemory(memDomains[i].domain, memDomains[i].available-50*1024);
 					}
 				}
 			}
